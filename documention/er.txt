@@ -1,0 +1,48 @@
+erDiagram
+    %% User Table for Authentication
+    %% Password is not plain text, it's hashed
+    USER {
+        int id PK
+        string username
+        string password "🔒 BCrypt Hash"
+        enum role "ADMIN, MODERATOR"
+    }
+
+    %% Main Vehicle Details Table
+    VEHICLE {
+        int id PK
+        string brand
+        string model
+        int year
+        decimal price
+        enum fuel_type
+        enum transmission
+        int mileage
+        enum status
+        text description
+        timestamp created_at
+    }
+
+    %% Vehicle Images Table
+    VEHICLE_IMAGE {
+        int id PK
+        int vehicle_id FK
+        string image_url
+    }
+
+    %% Customer Inquiries Table
+    %% Sensitive data is encrypted
+    INQUIRY {
+        int id PK
+        int vehicle_id FK
+        string customer_name "🔒 AES Encrypted"
+        string customer_email "🔒 AES Encrypted"
+        string customer_phone "🔒 AES Encrypted"
+        text message
+        enum status
+        timestamp created_at
+    }
+
+    %% Relationships
+    VEHICLE ||--o{ VEHICLE_IMAGE : "has photos"
+    VEHICLE ||--o{ INQUIRY : "receives inquiries"
