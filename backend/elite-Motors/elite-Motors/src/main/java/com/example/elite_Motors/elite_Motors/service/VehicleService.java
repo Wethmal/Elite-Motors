@@ -14,22 +14,19 @@ public class VehicleService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    // 1. වාහනයක් save කිරීම
     public Vehicle saveVehicle(Vehicle vehicle) {
         return vehicleRepository.save(vehicle);
     }
 
-    // 2. සියලුම වාහන ලබා ගැනීම
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
     }
 
-    // 3. ID එක මගින් වාහනයක් සෙවීම
     public Optional<Vehicle> getVehicleById(Long id) {
         return vehicleRepository.findById(id);
     }
 
-    // 4. වාහනයක විස්තර Update කිරීම
+    // මෙන්න මෙතන තමයි error එක තිබුණේ - දැන් මේක නිවැරදියි
     public Vehicle updateVehicle(Long id, Vehicle updatedVehicle) {
         return vehicleRepository.findById(id).map(vehicle -> {
             vehicle.setBrand(updatedVehicle.getBrand());
@@ -39,15 +36,16 @@ public class VehicleService {
             vehicle.setFuelType(updatedVehicle.getFuelType());
             vehicle.setDescription(updatedVehicle.getDescription());
             vehicle.setStatus(updatedVehicle.getStatus());
-            // පින්තූරය වෙනස් කරනවා නම් පමණක් imageUrl එක update කරන්න
-            if (updatedVehicle.getImageUrl() != null) {
-                vehicle.setImageUrl(updatedVehicle.getImageUrl());
+
+            // පින්තූර list එක update කරනවා නම් මෙහෙම කරන්න පුළුවන්
+            if (updatedVehicle.getImages() != null && !updatedVehicle.getImages().isEmpty()) {
+                vehicle.setImages(updatedVehicle.getImages());
             }
+
             return vehicleRepository.save(vehicle);
         }).orElseThrow(() -> new RuntimeException("Vehicle not found with id " + id));
     }
 
-    // 5. වාහනයක් Delete කිරීම
     public void deleteVehicle(Long id) {
         if (vehicleRepository.existsById(id)) {
             vehicleRepository.deleteById(id);

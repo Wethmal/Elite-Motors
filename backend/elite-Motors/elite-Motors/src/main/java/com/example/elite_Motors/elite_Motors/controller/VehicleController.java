@@ -1,6 +1,7 @@
 package com.example.elite_Motors.elite_Motors.controller;
 
 import com.example.elite_Motors.elite_Motors.entity.Vehicle;
+import com.example.elite_Motors.elite_Motors.entity.VehicleImage;
 import com.example.elite_Motors.elite_Motors.service.FileUploadService;
 import com.example.elite_Motors.elite_Motors.service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,10 +23,9 @@ public class VehicleController {
     @Autowired
     private FileUploadService fileUploadService;
 
-    // 1. වාහනයක් පින්තූරයත් සමඟ ඇතුළත් කිරීම (Multipart Request)
     @PostMapping("/add")
     public ResponseEntity<Vehicle> addVehicle(
-            @RequestParam("image") MultipartFile image,
+            @RequestParam("images") MultipartFile[] images, // Array එකක් ලෙස ගන්නවා
             @RequestParam("brand") String brand,
             @RequestParam("model") String model,
             @RequestParam("year") int year,
@@ -34,9 +35,6 @@ public class VehicleController {
             @RequestParam("status") String status) {
 
         try {
-            // පින්තූරය save කර නම ලබා ගැනීම
-            String imageName = fileUploadService.saveImage(image);
-
             Vehicle vehicle = new Vehicle();
             vehicle.setBrand(brand);
             vehicle.setModel(model);
@@ -45,9 +43,21 @@ public class VehicleController {
             vehicle.setFuelType(fuelType);
             vehicle.setDescription(description);
             vehicle.setStatus(status);
-            vehicle.setImageUrl(imageName);
 
+            List<VehicleImage> imageList = new ArrayList<>();
+
+            // පින්තූර එකින් එක Loop කරමින් Save කිරීම
+            for (MultipartFile file : images) {
+                String imageName = fileUploadService.saveImage(file);
+                VehicleImage vehicleImage = new VehicleImage();
+                vehicleImage.setImageUrl(imageName);
+                vehicleImage.setVehicle(vehicle); // Relationship එක set කරනවා
+                imageList.add(vehicleImage);
+            }
+
+            vehicle.setImages(imageList);
             return ResponseEntity.ok(vehicleService.saveVehicle(vehicle));
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

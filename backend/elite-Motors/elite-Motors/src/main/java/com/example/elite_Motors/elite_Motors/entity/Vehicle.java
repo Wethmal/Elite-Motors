@@ -5,11 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// වැදගත්: java.util.List පාවිච්චි කරන්න
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "vehicles")
-@Data // Getter, Setter, ToString auto-generate  (Lombok)
-@AllArgsConstructor //(Empty) constructor
-@NoArgsConstructor//fields (variables) construor
+@Data
+@AllArgsConstructor // සියලුම fields සහිත constructor එක
+@NoArgsConstructor  // හිස් (default) constructor එක
 public class Vehicle {
 
     @Id
@@ -27,5 +31,7 @@ public class Vehicle {
 
     private String status; // Available or Sold
 
-    private String imageUrl;
+    // One-to-Many Relationship: එක වාහනයකට පින්තූර කිහිපයක්
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VehicleImage> images = new ArrayList<>();
 }
