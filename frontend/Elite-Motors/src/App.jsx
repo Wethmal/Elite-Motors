@@ -17,6 +17,7 @@ import Booking from './pages/Booking';
 import Dashboard from './pages/admin/Dashboard'; 
 import ManageCars from './pages/admin/ManageCars';
 import EditCarModal from './pages/admin/EditCarModal';
+import ManageBookings from './pages/admin/ManageBookings';
 
 
 // 1. Customer Layout 
@@ -49,7 +50,7 @@ function App() {
         <Route path="/admin" element={<AdminLayout><Dashboard /></AdminLayout>} />
         <Route path="/admin/cars" element={<AdminLayout><ManageCars /></AdminLayout>} /> 
         <Route path="/admin/cars/edit/:id" element={<AdminLayout><EditCarModal /></AdminLayout>} />
-
+        <Route path="/admin/bookings" element={<AdminLayout><ManageBookings /></AdminLayout>} />
       </Routes>
     </Router>
   );

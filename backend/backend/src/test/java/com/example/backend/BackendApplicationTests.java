@@ -1,10 +1,10 @@
-package com.example.elite_Motors.elite_Motors;
+package com.example.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EliteMotorsApplicationTests {
+class BackendApplicationTests {
 
 	@Test
 	void contextLoads() {
