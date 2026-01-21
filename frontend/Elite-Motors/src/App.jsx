@@ -18,6 +18,7 @@ import Dashboard from './pages/admin/Dashboard';
 import ManageCars from './pages/admin/ManageCars';
 import EditCarModal from './pages/admin/EditCarModal';
 import ManageBookings from './pages/admin/ManageBookings';
+import ChatBot from './components/ChatBot';
 
 
 // 1. Customer Layout 
@@ -28,6 +29,7 @@ const CustomerLayout = ({ children }) => {
       <div className="flex-grow">
         {children}
       </div>
+      <ChatBot />
       <Footer />
     </div>
   );
