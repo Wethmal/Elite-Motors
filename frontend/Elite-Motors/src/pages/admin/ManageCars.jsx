@@ -1,28 +1,22 @@
-import { useState } from 'react';
-import { carsData } from '../../data/carsData';
+import { useState, useEffect } from 'react';
+import axios from 'axios'; // Axios Import කළා
 import { Edit, Trash2, Plus } from 'lucide-react';
 import EditCarModal from './EditCarModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// --- CUSTOM CONFIRMATION COMPONENT ---
-// This little component will appear INSIDE the toast notification
+// --- CUSTOM CONFIRM TOAST ---
 const ConfirmToast = ({ closeToast, onConfirm }) => (
   <div>
     <h3 className="font-bold text-gray-800">Are you sure?</h3>
     <p className="text-xs text-gray-500 mb-3">Do you really want to delete this?</p>
     <div className="flex gap-2">
-      {/* Yes Button */}
       <button 
-        onClick={() => {
-          onConfirm(); // Call the delete function
-          closeToast(); // Close the popup
-        }}
+        onClick={() => { onConfirm(); closeToast(); }}
         className="px-3 py-1.5 text-xs font-bold text-white bg-red-600 rounded shadow-sm hover:bg-red-700"
       >
         Yes, Delete
       </button>
-      {/* No Button */}
       <button 
         onClick={closeToast} 
         className="px-3 py-1.5 text-xs font-bold text-gray-700 bg-gray-100 border border-gray-300 rounded shadow-sm hover:bg-gray-200"
@@ -34,54 +28,94 @@ const ConfirmToast = ({ closeToast, onConfirm }) => (
 );
 
 const ManageCars = () => {
-  const [cars, setCars] = useState(carsData);
+  // 1. Cars List එක මුලින් හිස්ව තියෙනවා (Backend එකෙන් එනකම්)
+  const [cars, setCars] = useState([]);
   const [editingCar, setEditingCar] = useState(null);
 
-  // --- FUNCTIONS ---
+  // --- API URL ---
+  const API_URL = "http://localhost:8080/api/cars";
 
-  // Updated Delete Function
-  const handleDelete = (id) => {
-    
-    // 1. Define what happens when the user clicks "Yes"
-    const performDelete = () => {
-      setCars((prevCars) => prevCars.filter((car) => car.id !== id));
-      toast.success("Car deleted successfully!", { position: "bottom-right" });
-    };
+  // 2. Page Load වෙනකොටම Data ටික ගන්න (GET Request)
+  useEffect(() => {
+    fetchCars();
+  }, []);
 
-    // 2. Show the Custom Toast
-    toast(
-      <ConfirmToast onConfirm={performDelete} />, 
-      {
-        position: "top-center", // Show at the top center
-        autoClose: false,       // IMPORTANT: Don't disappear automatically
-        closeOnClick: false,    // Don't close if clicked on background
-        draggable: false,       // Disable dragging
-        className: "border-l-4 border-red-500", // Optional styling
-      }
-    );
+  // Backend එකෙන් කාර් ලිස්ට් එක ඉල්ලන Function එක
+  const fetchCars = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/all`);
+      setCars(response.data); // ආපු Data ටික State එකට දානවා
+    } catch (error) {
+      toast.error("Failed to fetch cars. Is the backend running?");
+      console.error(error);
+    }
   };
 
-  const handleSaveChanges = (updatedCar) => {
+  // --- HANDLE DELETE (Backend) ---
+  const handleDelete = (id) => {
+    const performDelete = async () => {
+      try {
+        // Backend එකට කියනවා මකන්න කියලා
+        await axios.delete(`${API_URL}/delete/${id}`);
+        
+        // සාර්ථක නම් UI එකෙන් අයින් කරනවා
+        setCars(cars.filter((car) => car.id !== id));
+        toast.success("Car deleted successfully!", { position: "bottom-right" });
+      } catch (error) {
+        toast.error("Failed to delete car.");
+      }
+    };
+
+    toast(<ConfirmToast onConfirm={performDelete} />, {
+      position: "top-center",
+      autoClose: false,
+      closeOnClick: false,
+      draggable: false,
+    });
+  };
+
+  // --- HANDLE SAVE (Add OR Update) ---
+  const handleSaveChanges = async (carData) => {
+    
     // Validation
-    if (!updatedCar.brand || updatedCar.brand.trim() === "") {
+    if (!carData.brand || carData.brand.trim() === "") {
       toast.warn("Brand name cannot be empty!", { position: "top-center" });
       return;
     }
 
-    const newCarList = cars.map((car) => (car.id === updatedCar.id ? updatedCar : car));
-    setCars(newCarList);
-    setEditingCar(null);
+    try {
+      if (carData.id) {
+        // ID එකක් තියෙනවා නම් ඒක UPDATE එකක් (PUT Request)
+        await axios.put(`${API_URL}/update/${carData.id}`, carData);
+        toast.success("Car updated successfully!");
+      } else {
+        // ID එකක් නැත්නම් ඒක NEW CAR එකක් (POST Request)
+        await axios.post(`${API_URL}/add`, carData);
+        toast.success("New car added successfully!");
+      }
 
-    toast.success("Car updated successfully!", {
-      position: "top-right",
-      autoClose: 3000,
+      // Save වුනාට පස්සේ ආයේ අලුත් ලිස්ට් එක ගන්නවා
+      fetchCars();
+      setEditingCar(null); // Modal එක වහනවා
+
+    } catch (error) {
+      toast.error("Failed to save changes.");
+      console.error(error);
+    }
+  };
+
+  // --- ADD NEW BUTTON CLICK ---
+  const handleAddNew = () => {
+    // අලුත් කාර් එකක් නිසා හිස් Object එකක් යවනවා
+    setEditingCar({
+      brand: "", model: "", year: "", price: "", fuel: "",
+      image: "", description: "", mileage: "", transmission: "",
+      status: "In Stock", certified: false, features: []
     });
   };
 
   return (
     <div className="p-6">
-      
-      {/* Toast Container needs to be here */}
       <ToastContainer />
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -89,7 +123,12 @@ const ManageCars = () => {
           <h1 className="text-3xl font-bold text-gray-800">Manage Cars</h1>
           <p className="text-gray-500">Full control over your vehicle inventory.</p>
         </div>
-        <button className="flex items-center justify-center gap-2 px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg">
+        
+        {/* ADD NEW BUTTON */}
+        <button 
+          onClick={handleAddNew}
+          className="flex items-center justify-center gap-2 px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg"
+        >
           <Plus size={20} /> Add New Car
         </button>
       </div>
@@ -110,6 +149,7 @@ const ManageCars = () => {
               <tr key={car.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-4">
+                    
                     <img src={car.image} alt={car.model} className="w-16 h-12 object-cover rounded-md shadow-sm" />
                     <div>
                       <p className="font-bold text-gray-900">{car.brand} {car.model}</p>
@@ -142,14 +182,12 @@ const ManageCars = () => {
                     <button 
                       onClick={() => setEditingCar(car)}
                       className="p-2 text-blue-600 transition bg-blue-50 rounded-lg hover:bg-blue-100"
-                      title="Edit"
                     >
                       <Edit size={18} />
                     </button>
                     <button 
                       onClick={() => handleDelete(car.id)}
                       className="p-2 text-red-600 transition bg-red-50 rounded-lg hover:bg-red-100"
-                      title="Delete"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -162,7 +200,7 @@ const ManageCars = () => {
         
         {cars.length === 0 && (
           <div className="p-8 text-center text-gray-500">
-            No cars found.
+            No cars found. Click "Add New Car" to start.
           </div>
         )}
       </div>
@@ -174,7 +212,6 @@ const ManageCars = () => {
           onSave={handleSaveChanges}
         />
       )}
-
     </div>
   );
 };

@@ -1,32 +1,70 @@
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { carsData } from '../data/carsData';
-import { ArrowLeft, CheckCircle, Calendar, Gauge, Fuel, Shield, Star, MapPin, Zap } from 'lucide-react';
+import axios from 'axios';
+import { ArrowLeft, CheckCircle, Calendar, Gauge, Fuel, Shield, Star, MapPin, Zap, Loader2 } from 'lucide-react';
 
 const CarDetails = () => {
-  const { id } = useParams();
-  const car = carsData.find((c) => c.id === parseInt(id));
+  const { id } = useParams(); // URL එකෙන් ID එක ගන්නවා
 
-  if (!car) {
+  // --- STATE VARIABLES ---
+  const [car, setCar] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // --- FETCH DATA ---
+  useEffect(() => {
+    const fetchCarDetails = async () => {
+      try {
+        // Backend එකෙන් අදාළ ID එකට විතරක් කෝල් කරනවා
+        const response = await axios.get(`http://localhost:8080/api/cars/${id}`);
+        setCar(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching car details:", err);
+        setError("Car not found or server error.");
+        setLoading(false);
+      }
+    };
+
+    fetchCarDetails();
+  }, [id]);
+
+  // 1. Status Color Helper
+  const getStatusColor = (status) => {
+    switch(status) {
+      case "In Stock": return "bg-blue-600";
+      case "Sold Out": return "bg-red-600";
+      case "Pre-order": return "bg-yellow-500";
+      default: return "bg-gray-600";
+    }
+  };
+
+  // --- LOADING STATE ---
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen pt-20">
+        <Loader2 size={48} className="text-blue-600 animate-spin" />
+        <p className="mt-4 text-gray-500">Loading car details...</p>
+      </div>
+    );
+  }
+
+  // --- ERROR STATE ---
+  if (error || !car) {
     return (
       <div className="flex items-center justify-center min-h-screen pt-20">
         <div className="text-center">
           <h2 className="mb-4 text-3xl font-bold text-gray-800">Car not found!</h2>
-          <Link to="/cars" className="text-blue-600 hover:underline">Back to Collection</Link>
+          <p className="mb-6 text-gray-500">The vehicle you are looking for does not exist or has been removed.</p>
+          <Link to="/cars" className="px-6 py-3 text-white transition bg-blue-600 rounded-lg hover:bg-blue-700">
+            Back to Collection
+          </Link>
         </div>
       </div>
     );
   }
 
-  // 1. Status by color
-  const getStatusColor = (status) => {
-    switch(status) {
-      case "In Stock": return "bg-blue-600";    // In Stock blue color
-      case "Sold Out": return "bg-red-600";     // Sold Out red color
-      case "Pre-order": return "bg-yellow-500"; // Pre-order yellow color
-      default: return "bg-gray-600";
-    }
-  };
-
+  // --- MAIN CONTENT ---
   return (
     <div className="min-h-screen px-4 bg-gray-50 pt-28 pb-12">
       <div className="container max-w-6xl mx-auto">
@@ -51,23 +89,21 @@ const CarDetails = () => {
                   src={car.image} 
                   alt={car.model} 
                   className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105" 
+                  onError={(e) => {e.target.src = "https://via.placeholder.com/600x400?text=No+Image"}}
                 />
               </div>
-              {/* 2. DYNAMIC BADGES SECTION */}
+              
+              {/* Badges */}
               <div className="absolute top-4 left-4 flex gap-2">
-                
-                {/* Status Badge (change the icon and color) */}
                 <span className={`px-3 py-1 text-xs font-bold text-white rounded-full shadow-md ${getStatusColor(car.status)}`}>
                   {car.status}
                 </span>
 
-                {/* Certified Badge (true only) */}
                 {car.certified && (
                   <span className="flex items-center gap-1 px-3 py-1 text-xs font-bold text-white bg-green-600 rounded-full shadow-md">
                     <Shield size={12} /> Certified
                   </span>
                 )}
-
               </div>
             </div>
 
@@ -132,19 +168,19 @@ const CarDetails = () => {
             </div>
 
             {/* PREMIUM FEATURES MAPPING */}
-           
             <div className="mb-8 p-6 bg-gray-100 rounded-2xl">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Premium Features</h3>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                
-                {/* Check if features exist, then map them */}
-                {car.features && car.features.map((feature, index) => (
-                  <li key={index} className="flex items-center gap-2 text-gray-700">
-                    <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-
+                {car.features && car.features.length > 0 ? (
+                  car.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2 text-gray-700">
+                      <CheckCircle size={18} className="text-green-500 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-gray-500 italic">No specific features listed.</li>
+                )}
               </ul>
             </div>
 
