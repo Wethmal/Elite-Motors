@@ -9,31 +9,31 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cars")
-@CrossOrigin("*") // Frontend එකට සම්බන්ධ වෙන්න අවසර දීම
+@CrossOrigin("*")
 public class CarController {
 
     @Autowired
     private CarRepository carRepository;
 
-    // 1. අලුත් කාර් එකක් දාන්න (CREATE)
+
     @PostMapping("/add")
     public Car addCar(@RequestBody Car car) {
         return carRepository.save(car);
     }
 
-    // 2. ඔක්කොම කාර් ටික ගන්න (READ ALL)
+
     @GetMapping("/all")
     public List<Car> getAllCars() {
         return carRepository.findAll();
     }
 
-    // 3. කාර් එකක් ID එකෙන් ගන්න (READ ONE) - Edit කරනකොට ඕන වෙන්න පුළුවන්
+
     @GetMapping("/{id}")
     public Car getCarById(@PathVariable Long id) {
         return carRepository.findById(id).orElse(null);
     }
 
-    // 4. කාර් එකක් Update කරන්න (UPDATE)
+
     @PutMapping("/update/{id}")
     public Car updateCar(@PathVariable Long id, @RequestBody Car carDetails) {
         Car car = carRepository.findById(id).orElse(null);
@@ -57,7 +57,7 @@ public class CarController {
         return null;
     }
 
-    // 5. කාර් එකක් මකන්න (DELETE)
+
     @DeleteMapping("/delete/{id}")
     public String deleteCar(@PathVariable Long id) {
         carRepository.deleteById(id);
