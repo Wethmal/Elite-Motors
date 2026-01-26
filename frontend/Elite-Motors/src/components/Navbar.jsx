@@ -8,7 +8,7 @@ const Navbar = () => {
 
   const isActive = (path) => location.pathname === path;
 
-  // Menu Items Configuration (ලේසියෙන් වෙනස් කරන්න පුළුවන් විදිහට හදාගත්තා)
+
   const navLinks = [
     { path: '/', label: 'Home', icon: Home },
     { path: '/cars', label: 'Cars', icon: Car },
