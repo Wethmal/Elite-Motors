@@ -21,17 +21,17 @@ const ChatBot = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  // මැසේජ් එක යවන Function එක
+ 
   const handleSend = () => {
     if (!input.trim()) return;
 
-    // 1. User ගේ මැසේජ් එක Add කරනවා
+   
     const userMessage = { text: input, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setIsTyping(true); // බොට් Type කරනවා වගේ පෙන්වනවා
+    setIsTyping(true); 
 
-    // 2. උත්තරේ හොයනවා (Logic)
+  
     const lowerInput = input.toLowerCase();
     const match = chatData.find((item) => 
       item.keywords.some((keyword) => lowerInput.includes(keyword))
@@ -39,7 +39,7 @@ const ChatBot = () => {
 
     const botReplyText = match ? match.response : defaultResponse;
 
-    // 3. තත්පර 1 කට පස්සේ බොට් උත්තර දෙනවා
+   
     setTimeout(() => {
       const botMessage = { text: botReplyText, sender: "bot" };
       setMessages((prev) => [...prev, botMessage]);
@@ -47,7 +47,7 @@ const ChatBot = () => {
     }, 1000);
   };
 
-  // Enter ගැහුවම Send වෙන්න
+  
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') handleSend();
   };

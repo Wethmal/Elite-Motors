@@ -35,7 +35,7 @@ public class Car {
     private String status;
     private Boolean certified;
 
-    // මෙන්න මේ පේළිය තමයි වෙනස් කළේ
+   
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> features;
 }
