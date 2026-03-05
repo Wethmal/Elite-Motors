@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios'; // Axios Import කළා
+import axios from 'axios'; 
 import { Edit, Trash2, Plus } from 'lucide-react';
 import EditCarModal from './EditCarModal';
 import { ToastContainer, toast } from 'react-toastify';
@@ -28,23 +28,22 @@ const ConfirmToast = ({ closeToast, onConfirm }) => (
 );
 
 const ManageCars = () => {
-  // 1. Cars List එක මුලින් හිස්ව තියෙනවා (Backend එකෙන් එනකම්)
+
   const [cars, setCars] = useState([]);
   const [editingCar, setEditingCar] = useState(null);
 
   // --- API URL ---
   const API_URL = "http://localhost:8080/api/cars";
 
-  // 2. Page Load වෙනකොටම Data ටික ගන්න (GET Request)
   useEffect(() => {
     fetchCars();
   }, []);
 
-  // Backend එකෙන් කාර් ලිස්ට් එක ඉල්ලන Function එක
+
   const fetchCars = async () => {
     try {
       const response = await axios.get(`${API_URL}/all`);
-      setCars(response.data); // ආපු Data ටික State එකට දානවා
+      setCars(response.data); 
     } catch (error) {
       toast.error("Failed to fetch cars. Is the backend running?");
       console.error(error);
@@ -55,10 +54,10 @@ const ManageCars = () => {
   const handleDelete = (id) => {
     const performDelete = async () => {
       try {
-        // Backend එකට කියනවා මකන්න කියලා
+        
         await axios.delete(`${API_URL}/delete/${id}`);
         
-        // සාර්ථක නම් UI එකෙන් අයින් කරනවා
+        
         setCars(cars.filter((car) => car.id !== id));
         toast.success("Car deleted successfully!", { position: "bottom-right" });
       } catch (error) {

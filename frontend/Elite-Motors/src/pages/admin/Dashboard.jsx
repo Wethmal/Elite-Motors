@@ -20,7 +20,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // API Calls දෙකම එකපාර ගන්නවා (Parallel Fetching)
+        
         const [carsResponse, bookingsResponse] = await Promise.all([
           axios.get("http://localhost:8080/api/cars/all"),
           axios.get("http://localhost:8080/api/bookings/all")
@@ -35,7 +35,7 @@ const Dashboard = () => {
         
         // Price Calculation Logic (String "13,500,000 LKR" -> Number)
         const totalValue = cars.reduce((acc, car) => {
-          // අකුරු සහ කොමා අයින් කරලා ඉලක්කම් විතරක් ගන්නවා
+          
           const priceNumber = parseFloat(car.price.replace(/[^0-9.]/g, '')) || 0;
           return acc + priceNumber;
         }, 0);
@@ -53,7 +53,7 @@ const Dashboard = () => {
           inventoryValue: totalValue
         });
 
-        // අලුත්ම Bookings 5 විතරක් ගන්නවා
+        
         setRecentBookings(bookings.reverse().slice(0, 5));
         setLoading(false);
 

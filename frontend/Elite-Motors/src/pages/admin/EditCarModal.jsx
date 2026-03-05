@@ -3,8 +3,7 @@ import { X, Save } from 'lucide-react';
 
 const EditCarModal = ({ car, onClose, onSave }) => {
   
-  // 1. CHECK MODE: කාර් එකට ID එකක් තියෙනවද බලනවා
-  // ID එකක් තියෙනවා නම් true (Edit), නැත්නම් false (Add New)
+
   const isEditMode = car.id ? true : false;
 
   // --- STATE VARIABLES ---
@@ -20,8 +19,7 @@ const EditCarModal = ({ car, onClose, onSave }) => {
   const [image, setImage] = useState(car.image || "");
   const [description, setDescription] = useState(car.description || "");
   
-  // 2. SAFETY CHECK: car.features නැත්නම් (null නම්) හිස්ව තියන්න
-  // අලුත් කාර් එකක් දානකොට features නැති වෙන්න පුළුවන් නිසා මේක වැදගත්
+
   const [features, setFeatures] = useState(car.features ? car.features.join(', ') : '');
 
   // --- HANDLE SUBMIT ---
@@ -29,7 +27,7 @@ const EditCarModal = ({ car, onClose, onSave }) => {
     e.preventDefault();
 
     const updatedCar = {
-      id: car.id, // අලුත් එකක් නම් මේක undefined වෙයි (ප්‍රශ්නයක් නෑ)
+      id: car.id,
       brand,
       model,
       year,
@@ -41,7 +39,7 @@ const EditCarModal = ({ car, onClose, onSave }) => {
       mileage,
       image,
       description,
-      // String to Array conversion (හිස් ඒවා අයින් කරනවා)
+      
       features: features.split(',').map((item) => item.trim()).filter(item => item !== "")
     };
 
@@ -55,7 +53,7 @@ const EditCarModal = ({ car, onClose, onSave }) => {
         
         {/* Header Section */}
         <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
-          {/* 3. DYNAMIC HEADER: Edit ද Add ද කියලා බලලා මාතෘකාව වෙනස් කරනවා */}
+         
           <h3 className="text-lg font-bold text-gray-800">
             {isEditMode ? "Edit Car Details" : "Add New Car"}
           </h3>

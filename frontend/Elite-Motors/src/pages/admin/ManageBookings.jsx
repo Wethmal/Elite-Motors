@@ -93,7 +93,7 @@ const ManageBookings = () => {
           
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              {/* --- HEADERS වෙනස් කළා --- */}
+              
               <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Customer</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Car Info</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Booking Date</th>
@@ -130,7 +130,7 @@ const ManageBookings = () => {
                   </div>
                 </td>
 
-                {/* 3. Date Column (වෙනමම) */}
+              
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg w-fit">
                     <Calendar size={14} className="text-gray-600" />
@@ -138,7 +138,7 @@ const ManageBookings = () => {
                   </div>
                 </td>
 
-                {/* 4. Message Column (අලුතින් හැදුවා) */}
+                {/* 4. Message Column ) */}
                 <td className="px-6 py-4 max-w-xs">
                   {item.note || item.message ? (
                     <div className="flex items-start gap-2 text-sm text-gray-600 bg-yellow-50 p-3 rounded-lg border border-yellow-100">
